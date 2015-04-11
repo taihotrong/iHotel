@@ -68,7 +68,7 @@ NSArray* beacons;
     cell.textLabel.text = proximityLabel;
     
     if (beacon.rssi != 0) {
-        double distance = [self calculateAccuracy:-62 :beacon.rssi];
+        double distance = [self calculateAccuracy:-62 andRSSI:beacon.rssi];
         NSString *detailLabel = [NSString
                                  stringWithFormat:
                                  @"Major: %d, Minor: %d, RSSI: %d, accuracy: %f, distance: %f, UUID: %@",
@@ -80,7 +80,7 @@ NSArray* beacons;
     return cell;
 }
 
-- (double) calculateAccuracy:(int) txPower: (double) rssi {
+- (double) calculateAccuracy:(int) txPower andRSSI: (double) rssi {
     if (rssi == 0) {
         return -1.0; // if we cannot determine accuracy, return -1.
     }

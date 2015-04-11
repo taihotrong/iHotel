@@ -7,13 +7,13 @@
 //
 
 #import "AppDelegate.h"
-#import "IBeaconListViewController.h"
 
 @implementation AppDelegate
 @synthesize window = _window;
-@synthesize viewController = _viewController;
+//@synthesize viewController = _viewController;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    NSLog(@"didFinishLaunchingWithOptions");
     NSUUID *beaconUUID = [[NSUUID alloc] initWithUUIDString:
                           @"E2C56DB5-DFFB-48D2-B060-D0F5A71096E0"];
     NSString *beaconIdentifier = @"com.itlabs4u.ibeacon";
@@ -66,13 +66,6 @@
 -(void)locationManager:(CLLocationManager *)manager didRangeBeacons:
 (NSArray *)beacons inRegion:(CLBeaconRegion *)region {
     NSString *message = @"";
-//    NSLog(@"didRangeBeacons %@",beacons.firstObject);
-//    IBeaconListViewController *viewController = (IBeaconListViewController*)self.window.rootViewController;
-    if(beacons.count > 0) {
-        [IBeaconListViewController setIBeacon:beacons];
-    }
-//    [viewController.tableView reloadData];
-    
     if(beacons.count > 0) {
         CLBeacon *nearestBeacon = beacons.firstObject;
         

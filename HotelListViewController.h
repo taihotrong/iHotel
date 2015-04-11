@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "AFNetworking.h"
+#import "SVProgressHUD.h"
 
-@interface HotelListViewController : UIViewController <UITableViewDelegate, UITableViewDataSource> 
+@interface HotelListViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 
 @property (nonatomic, strong) IBOutlet UITableView *tableViews;
 

@@ -8,11 +8,32 @@
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import <CoreData/CoreData.h>
 
 @interface HotelData : NSObject {
-//    NSArray *hNames = [NSArray arrayWithObjects:@"Egg Benedict", @"Mushroom Risotto", @"Full Breakfast", @"Hamburger", @"Ham and Egg Sandwich",nil];
 }
-+ (void) initData:(NSDictionary*) listHotel;
+@property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
+@property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
+@property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+
+- (void)saveContext;
+- (NSURL *)applicationDocumentsDirectory;
+
++ (void) initData:(NSDictionary*) listHotel withUIImageView:(UIImageView *) imageView;
+/*
+ hid= [[NSMutableArray alloc] init];
+ hImagesURL= [[NSMutableArray alloc] init];
+ hImages= [[NSMutableArray alloc] init];
+ hAddresses= [[NSMutableArray alloc] init];
+ hListImages= [[NSMutableArray alloc] init];
+ hPhone= [[NSMutableArray alloc] init];
+ hNames= [[NSMutableArray alloc] init];
+ hRating= [[NSMutableArray alloc] init];
+ hRatingNum= [[NSMutableArray alloc] init];
+ hDistance= [[NSMutableArray alloc] init];
+ hPrice= [[NSMutableArray alloc] init];
+ */
++ (void) initData:(NSMutableArray *) fullListHotel;
 + (NSMutableArray*) getArrayName;
 + (NSArray*) getID;
 + (NSArray*) getNames;

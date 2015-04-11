@@ -14,10 +14,12 @@
 @interface AppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-@property (strong, nonatomic) HotelListViewController *viewController;
+//@property (strong, nonatomic) HotelListViewController *viewController;
 @property (strong, nonatomic) CLLocationManager *locationManager;
+
 @property CLProximity lastProximity;
 
--(void)sendLocalNotificationWithMessage:(NSString*)message;
+- (void)sendLocalNotificationWithMessage:(NSString*)message;
+
 @end
 

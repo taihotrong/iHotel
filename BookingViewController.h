@@ -8,25 +8,26 @@
 
 #import <UIKit/UIKit.h>
 #import "HotelData.h"
+#import "AFNetworking.h"
 
 @interface BookingViewController : UIViewController
-@property (weak, nonatomic) IBOutlet UILabel *hotelName;
-@property (weak, nonatomic) IBOutlet UILabel *roomType;
-@property (weak, nonatomic) IBOutlet UITextField *rooms;
-@property (weak, nonatomic) IBOutlet UITextField *adults;
-@property (weak, nonatomic) IBOutlet UITextField *children;
-@property (weak, nonatomic) IBOutlet UITextField *startTF;
-@property (weak, nonatomic) IBOutlet UITextField *endTF;
-@property (weak, nonatomic) IBOutlet UIButton *changeStartBT;
-@property (weak, nonatomic) IBOutlet UIButton *changeEndBT;
+@property (weak, nonatomic) IBOutlet UILabel *hotelNameLB;
+@property (weak, nonatomic) IBOutlet UILabel *roomTypeLB;
+@property (weak, nonatomic) IBOutlet UITextField *roomsTF;
+@property (weak, nonatomic) IBOutlet UITextField *adultsTF;
+@property (weak, nonatomic) IBOutlet UITextField *childrenTF;
+@property (weak, nonatomic) IBOutlet UIButton *startBT;
+@property (weak, nonatomic) IBOutlet UIButton *endBT;
 
-@property (weak, nonatomic) IBOutlet UITextField *roomChargeTF;
-@property (weak, nonatomic) IBOutlet UITextField *addFeeTF;
-@property (weak, nonatomic) IBOutlet UITextField *totalTF;
+@property (weak, nonatomic) IBOutlet UILabel *roomChargeLB;
+@property (weak, nonatomic) IBOutlet UILabel *addFeeLB;
+@property (weak, nonatomic) IBOutlet UILabel *totalLB;
 @property (weak, nonatomic) IBOutlet UITextField *firstNameTF;
 @property (weak, nonatomic) IBOutlet UITextField *lastNameTF;
 @property (weak, nonatomic) IBOutlet UITextField *emailTF;
 @property (weak, nonatomic) IBOutlet UITextField *phoneTF;
+
+@property (weak, nonatomic) IBOutlet UIButton *bookingBT;
 
 @property int indexHotel;
 @end

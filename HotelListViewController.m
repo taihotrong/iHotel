@@ -19,31 +19,31 @@
 
 NSArray *hNames;
 NSArray *hAddresses;
-NSArray *hImagesURL;
 NSArray *hImages;
 NSArray *hRating;
 NSArray *hRatingNum;
 NSArray *hDistance;
 NSArray *hPrice;
 NSArray *hPhone;
-//@synthesize tableViews;
+
 static NSString * const getListHotelURL = @"http://ibeacon.itlabs4u.com/ApiProtocol/GetListHotels?page_size=1&page_num=20";
-NSDictionary* listHotel;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [self getListHotel];
-//    tableViews.contentInset = UIEdgeInsetsZero;
     self.tableViews.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.tableViews.bounds.size.width, 0.01f)];
     self.tableViews.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.tableViews.bounds.size.width, 0.01f)];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
+}
+
+- (void) applicationBecomeActive {
+    [self getListHotel];
 }
 
 - (void) getDataToListView {
     NSLog(@"getDataToListView");
     hNames = [HotelData getNames];
     hAddresses = [HotelData getAddresses];
-    hImagesURL = [HotelData getImages];
     hRating = [HotelData getRating];
     hRatingNum = [HotelData getRatingNum];
     hDistance = [HotelData getDistance];
@@ -57,6 +57,7 @@ NSDictionary* listHotel;
 }
 
 - (void)getListHotel {
+    [SVProgressHUD showWithStatus:@"Loading data ..."];
     NSString *string = getListHotelURL;
     NSURL *url = [NSURL URLWithString:string];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
@@ -66,16 +67,13 @@ NSDictionary* listHotel;
     operation.responseSerializer = [AFJSONResponseSerializer serializer];
     
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-        
-        // 3
-        listHotel = (NSDictionary *)responseObject;
-        [HotelData initData:listHotel];
+        [self setListHotelData:responseObject];
         [self getDataToListView];
         [self.tableViews reloadData];
+        [SVProgressHUD dismiss];
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        
-        // 4
+        [SVProgressHUD dismiss];
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error Retrieving Hotel Detail"
                                                             message:[error localizedDescription]
                                                            delegate:nil
@@ -88,17 +86,113 @@ NSDictionary* listHotel;
     [operation start];
 }
 
+NSMutableArray *fullArray;
+- (void) setListHotelData:(NSDictionary *) listHotelData {
+    NSArray *a = listHotelData[@"listHotels"];
+    NSMutableArray *hid= [[NSMutableArray alloc] init];
+    NSMutableArray *hImagesURL= [[NSMutableArray alloc] init];
+    NSMutableArray *hImages= [[NSMutableArray alloc] init];
+    NSMutableArray *hAddresses= [[NSMutableArray alloc] init];
+    NSMutableArray *hListImages= [[NSMutableArray alloc] init];
+    NSMutableArray *hPhone= [[NSMutableArray alloc] init];
+    NSMutableArray *hNames= [[NSMutableArray alloc] init];
+    NSMutableArray *hRating= [[NSMutableArray alloc] init];
+    NSMutableArray *hRatingNum= [[NSMutableArray alloc] init];
+    NSMutableArray *hDistance= [[NSMutableArray alloc] init];
+    NSMutableArray *hPrice= [[NSMutableArray alloc] init];
+    NSDictionary *b;
+    fullArray = [[NSMutableArray alloc] init];
+    NSString *imageURL = @"YourURLHere";
+    
+    // 1
+    for (int i = 0; i < [a count]; i ++) {
+        b = a[i];
+        [hid addObject:b[@"id"]];
+        [hImagesURL addObject:b[@"thumb"]];
+        imageURL = b[@"thumb"];
+        [hImages addObject:[UIImage imageNamed:@"ic_action_picture"]];
+        [self isExistImage:imageURL index:i imageArray:hImages];
+        
+        [hAddresses addObject:b[@"address"]];
+        [hListImages addObject:b[@"list_image_name"]];
+        [hPhone addObject:b[@"phone_number"]];
+        [hNames addObject:b[@"name"]];
+        [hRating addObject:b[@"rate"]];
+        [hPrice addObject:b[@"price"]];
+        
+        // Add-in info
+        NSInteger temp = arc4random_uniform(1000);
+        [hRatingNum addObject:[NSNumber numberWithInteger:temp]];
+        [hDistance addObject:[[NSString alloc] initWithFormat:@"%.01f km",(float) rand() / RAND_MAX * 10]];
+        
+        NSLog(@"Data %d",i);
+    }
+    
+    //2
+    [fullArray addObject:hid];
+    [fullArray addObject:hImagesURL];
+    [fullArray addObject:hImages];
+    [fullArray addObject:hAddresses];
+    [fullArray addObject:hListImages];
+    [fullArray addObject:hPhone];
+    [fullArray addObject:hNames];
+    [fullArray addObject:hRating];
+    [fullArray addObject:hRatingNum];
+    [fullArray addObject:hDistance];
+    [fullArray addObject:hPrice];
+    
+    [HotelData initData:fullArray];
+}
+
+- (BOOL) isExistImage: (NSString *) imageURL index:(int) index imageArray:(NSMutableArray *) hImages {
+    NSArray *tmps = [imageURL componentsSeparatedByString:@"/"];
+    NSString *imageName = tmps[[tmps count] - 1];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
+                                                             NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *path = [documentsDirectory stringByAppendingPathComponent:
+                          [NSString stringWithString: imageName] ];
+    BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:path];
+    
+    // image is exist in local directory
+    if (fileExists) {
+        NSLog(@"Load image from local dir: %@", path);
+        UIImage *image = [UIImage imageWithContentsOfFile:path];
+        [hImages replaceObjectAtIndex:index withObject:image];
+        return true;
+    }
+    
+    // new image
+    else {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:imageURL]];
+            UIImage *image = [UIImage imageWithData:imageData];
+            [imageData writeToFile:path atomically:YES];
+            NSLog(@"Load image from URL & save to dir: %@", path);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // Update the UI
+                [hImages replaceObjectAtIndex:index withObject:image];
+                [fullArray replaceObjectAtIndex:2 withObject:hImages];
+                [self getDataToListView];
+                [self.tableViews reloadData];
+            });
+        });
+    }
+    return false;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
 //    NSLog(@"numberOfRowsInSection, count = %d", [hNames count]);
     return [hNames count];
 }
 
+HotelCell *cell;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *simpleTableIdentifier = @"HotelCell";
     
-    HotelCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+    cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
     
     if (cell == nil) {
         cell = [[HotelCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];
@@ -121,7 +215,7 @@ NSDictionary* listHotel;
     if ([segue.identifier isEqualToString:@"showHotelDetail"]) {
         NSIndexPath *indexPath = [self.tableViews indexPathForSelectedRow];
         HotelDetailViewController *destViewController = segue.destinationViewController;
-        destViewController.indexHotel = indexPath.row;
+        destViewController.indexHotel = (int) indexPath.row;
     }
 }
 
